@@ -22,8 +22,9 @@ describe('Test-requests middleware', function() {
 
   describe('request-processing', function() {
 
-    var PORT         = 3434,
-        CLEAN_DB_URL = 'http://localhost:' + PORT + '/_test/clean_db';
+    var PORT          = 3434,
+        TEST_BASE_URL = 'http://localhost:' + PORT + '/_test/',
+        CLEAN_DB_URL  = TEST_BASE_URL + 'clean_db';
 
     describe('when not in the test environment', function() {
 
@@ -42,6 +43,30 @@ describe('Test-requests middleware', function() {
         request(CLEAN_DB_URL, function(error, response, body) {
           expect(body).to.match(/Default response/);
           done();
+        });
+      });
+
+    });
+
+    describe('when in the test environment', function() {
+
+      process.env.NODE_ENV = 'test';
+      var testServer = require('./testServer');
+
+      before(function(done) {
+        testServer.startServer(PORT, '/', done);
+      });
+
+      after(function(done) {
+        testServer.stopServer(done);
+      });
+
+      describe('when requesting an unregistered test handler', function() {
+        it('404s', function(done) {
+          request(TEST_BASE_URL + 'bla', function(error, response, body) {
+            expect(response.statusCode).to.be(404);
+            done();
+          });
         });
       });
 
