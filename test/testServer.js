@@ -19,3 +19,5 @@ module.exports.startServer = function(port, path, callback) {
 module.exports.stopServer = function(callback) {
   server.close(callback);
 };
+
+module.exports.testRequests = testRequests;

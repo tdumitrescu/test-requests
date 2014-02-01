@@ -84,6 +84,27 @@ describe('Test-requests middleware', function() {
         });
       });
 
+      describe('when requesting a registered handler', function() {
+        var x;
+
+        beforeEach(function(done) {
+          x = null;
+          testServer.testRequests.registerHandlers({
+            clean_db: function() {
+              x = 5;
+            }
+          });
+          done();
+        });
+
+        it('calls the handler', function(done) {
+          expect(x).to.be(null);
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(x).to.be(5);
+            done();
+          });
+        });
+      });
     });
 
   });
