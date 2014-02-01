@@ -3,8 +3,18 @@
 process.env.NODE_ENV = 'test';
 
 var expect       = require('expect.js'),
+    Path         = require('path'),
     request      = require('request'),
-    testRequests = require('../index');
+    trPath       = require.resolve(Path.resolve('index')),
+    serverPath   = require.resolve('./testServer'),
+    testRequests = require(trPath);
+
+var reloadServerInEnv = function(env) {
+  process.env.NODE_ENV = env;
+  delete require.cache[trPath];
+  delete require.cache[serverPath];
+  return require('./testServer');
+};
 
 describe('Test-requests middleware', function() {
 
@@ -28,8 +38,7 @@ describe('Test-requests middleware', function() {
 
     describe('when not in the test environment', function() {
 
-      process.env.NODE_ENV = 'not_test';
-      var testServer = require('./testServer');
+      var testServer = reloadServerInEnv('not_test');
 
       before(function(done) {
         testServer.startServer(PORT, '/', done);
@@ -50,8 +59,7 @@ describe('Test-requests middleware', function() {
 
     describe('when in the test environment', function() {
 
-      process.env.NODE_ENV = 'test';
-      var testServer = require('./testServer');
+      var testServer = reloadServerInEnv('test');
 
       before(function(done) {
         testServer.startServer(PORT, '/', done);
