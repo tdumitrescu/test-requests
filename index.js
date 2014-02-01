@@ -3,8 +3,14 @@
 var handleTestRequests, passThrough, requestHelper;
 
 handleTestRequests = function(req, res, next) {
-  res.statusCode = 404;
-  res.end();
+  var pathMatches = req.url.match(/^\/_test\/(.+)/);
+
+  if (pathMatches === null) {
+    return next();
+  } else {
+    res.statusCode = 404;
+    res.end();
+  }
 };
 
 passThrough = function(req, res, next) {
