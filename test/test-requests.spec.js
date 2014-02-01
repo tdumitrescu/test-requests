@@ -33,7 +33,8 @@ describe('Test-requests middleware', function() {
   describe('request-processing', function() {
 
     var PORT          = 3434,
-        TEST_BASE_URL = 'http://localhost:' + PORT + '/_test/',
+        SERVER_URL    = 'http://localhost:' + PORT + '/',
+        TEST_BASE_URL = SERVER_URL + '_test/',
         CLEAN_DB_URL  = TEST_BASE_URL + 'clean_db';
 
     describe('when not in the test environment', function() {
@@ -69,12 +70,17 @@ describe('Test-requests middleware', function() {
         testServer.stopServer(done);
       });
 
-      describe('when requesting an unregistered test handler', function() {
-        it('404s', function(done) {
-          request(TEST_BASE_URL + 'bla', function(error, response, body) {
-            expect(response.statusCode).to.be(404);
-            done();
-          });
+      it('passes along non-test requests', function(done) {
+        request(SERVER_URL + 'bla', function(error, response, body) {
+          expect(body).to.match(/Default response/);
+          done();
+        });
+      });
+
+      it('404s when requesting an unregistered test handler', function(done) {
+        request(TEST_BASE_URL + 'bla', function(error, response, body) {
+          expect(response.statusCode).to.be(404);
+          done();
         });
       });
 
