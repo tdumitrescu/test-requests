@@ -8,8 +8,15 @@ handleTestRequests = function(req, res, next) {
   if (pathMatches === null) {
     return next();
   } else {
-    res.statusCode = 404;
-    res.end();
+    var handler = requestHelper.registeredHandlers[pathMatches[1]];
+    if (!!handler) {
+      handler();
+      res.statusCode = 200;
+      res.end();
+    } else {
+      res.statusCode = 404;
+      res.end();
+    }
   }
 };
 
