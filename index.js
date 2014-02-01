@@ -2,7 +2,12 @@
 
 var handleTestRequests, passThrough, requestHelper;
 
-handleTestRequests = passThrough = function(req, res, next) {
+handleTestRequests = function(req, res, next) {
+  res.statusCode = 404;
+  res.end();
+};
+
+passThrough = function(req, res, next) {
   return next();
 };
 
