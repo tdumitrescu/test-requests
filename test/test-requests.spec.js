@@ -104,6 +104,13 @@ describe('Test-requests middleware', function() {
             done();
           });
         });
+
+        it('reponds successfully', function(done) {
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(response.statusCode).to.be(200);
+            done();
+          });
+        });
       });
     });
 
