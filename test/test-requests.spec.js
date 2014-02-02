@@ -111,6 +111,18 @@ describe('Test-requests middleware', function() {
             done();
           });
         });
+
+        it('responds with String return values from handlers', function(done) {
+          testServer.testRequests.registerHandlers({
+            clean_db: function() {
+              return "Cleaned DB";
+            }
+          });
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(body).to.match(/Cleaned DB/);
+            done();
+          });
+        });
       });
     });
 
