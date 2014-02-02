@@ -10,9 +10,15 @@ handleTestRequests = function(req, res, next) {
   } else {
     var handler = requestHelper.registeredHandlers[pathMatches[1]];
     if (!!handler) {
-      handler();
+      var handlerResult = handler();
       res.statusCode = 200;
-      res.end();
+      switch(typeof handlerResult) {
+        case "string":
+          res.end(handlerResult);
+          break;
+        default:
+          res.end();
+      }
     } else {
       res.statusCode = 404;
       res.end();
