@@ -14,6 +14,7 @@ handleTestRequests = function(req, res, next) {
       res.statusCode = 200;
       switch(typeof handlerResult) {
         case "object":
+          res.setHeader("Content-Type", "application/json");
           res.end(JSON.stringify(handlerResult));
           break;
         case "string":
