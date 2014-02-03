@@ -10,14 +10,14 @@ handleTestRequests = function(req, res, next) {
   } else {
     var handler = requestHelper.registeredHandlers[pathMatches[1]];
     if (!!handler) {
-      if (handler.length > 0) {
+      if (handler.length > 2) {
         // ASYNC: handler uses done() callback
-        handler(function(handlerResult) {
+        handler(req, res, function(handlerResult) {
           sendHandlerResponse(res, handlerResult);
         });
       } else {
         // SYNC: no callback expected
-        sendHandlerResponse(res, handler());
+        sendHandlerResponse(res, handler(req, res));
       }
     } else {
       res.statusCode = 404;

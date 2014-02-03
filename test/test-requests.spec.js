@@ -147,7 +147,8 @@ describe('Test-requests middleware', function() {
         beforeEach(function(done) {
           y = null;
           testServer.testRequests.registerHandlers({
-            clean_db: function(trDone) {
+            clean_db: function(req, res, trDone) {
+              res.setHeader("Set-Cookie", "user_id=10");
               setTimeout(function() {
                 y = 17;
                 trDone({newY: y});
@@ -171,6 +172,14 @@ describe('Test-requests middleware', function() {
             done();
           });
         });
+
+        it('provides access to the request and response objects', function(done) {
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(response.headers["set-cookie"]).to.eql(["user_id=10"]);
+            done();
+          });
+        });
+
       });
 
     });
