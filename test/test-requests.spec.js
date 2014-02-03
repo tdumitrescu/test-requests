@@ -140,6 +140,33 @@ describe('Test-requests middleware', function() {
           done();
         });
       });
+
+
+      describe('when the handler uses a done() callback for asynchronous operations', function() {
+        var y;
+
+        beforeEach(function(done) {
+          y = null;
+          testServer.testRequests.registerHandlers({
+            clean_db: function(trDone) {
+              setTimeout(function() {
+                y = 17;
+                trDone();
+              }, 500);
+            }
+          });
+          done();
+        });
+
+        it('responds after the handler has finished', function(done) {
+          expect(y).to.be(null);
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(y).to.be(17);
+            done();
+          });
+        });
+      });
+
     });
 
   });
