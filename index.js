@@ -13,6 +13,9 @@ handleTestRequests = function(req, res, next) {
       var handlerResult = handler();
       res.statusCode = 200;
       switch(typeof handlerResult) {
+        case "object":
+          res.end(JSON.stringify(handlerResult));
+          break;
         case "string":
           res.end(handlerResult);
           break;
