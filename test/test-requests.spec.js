@@ -112,7 +112,7 @@ describe('Test-requests middleware', function() {
           });
         });
 
-        it('responds with String return values from handlers', function(done) {
+        it('responds with String return values when handlers return strings', function(done) {
           testServer.testRequests.registerHandlers({
             clean_db: function() {
               return "Cleaned DB";
@@ -122,6 +122,22 @@ describe('Test-requests middleware', function() {
             expect(body).to.match(/Cleaned DB/);
             done();
           });
+        });
+      });
+
+      it('responds with JSON return values when handlers return objects', function(done) {
+        var fixtures = {fixtures: ['object1', 'object2']};
+
+        testServer.testRequests.registerHandlers({
+          clean_db: function() {
+            return fixtures;
+          }
+        });
+
+        request(CLEAN_DB_URL, function(error, response, body) {
+          var responseObj = JSON.parse(body);
+          expect(responseObj.fixtures[0]).to.eql('object1');
+          done();
         });
       });
     });
