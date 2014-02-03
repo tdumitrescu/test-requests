@@ -1,6 +1,6 @@
 'use strict';
 
-var handleTestRequests, passThrough, requestHelper;
+var handleTestRequests, passThrough, requestHelper, sendHandlerResponse;
 
 handleTestRequests = function(req, res, next) {
   var pathMatches = req.url.match(/^\/_test\/(.+)/);
@@ -10,18 +10,14 @@ handleTestRequests = function(req, res, next) {
   } else {
     var handler = requestHelper.registeredHandlers[pathMatches[1]];
     if (!!handler) {
-      var handlerResult = handler();
-      res.statusCode = 200;
-      switch(typeof handlerResult) {
-        case "object":
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(handlerResult));
-          break;
-        case "string":
-          res.end(handlerResult);
-          break;
-        default:
-          res.end();
+      if (handler.length > 0) {
+        // ASYNC: handler uses done() callback
+        handler(function(handlerResult) {
+          sendHandlerResponse(res, handlerResult);
+        });
+      } else {
+        // SYNC: no callback expected
+        sendHandlerResponse(res, handler());
       }
     } else {
       res.statusCode = 404;
@@ -33,6 +29,21 @@ handleTestRequests = function(req, res, next) {
 passThrough = function(req, res, next) {
   return next();
 };
+
+sendHandlerResponse = function(res, handlerResult) {
+  res.statusCode = 200;
+  switch(typeof handlerResult) {
+    case "object":
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(handlerResult));
+      break;
+    case "string":
+      res.end(handlerResult);
+      break;
+    default:
+      res.end();
+  }
+}
 
 requestHelper = process.env.NODE_ENV === "test" ? handleTestRequests : passThrough;
 
