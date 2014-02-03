@@ -135,8 +135,7 @@ describe('Test-requests middleware', function() {
         });
 
         request(CLEAN_DB_URL, function(error, response, body) {
-          var responseObj = JSON.parse(body);
-          expect(responseObj.fixtures[0]).to.eql('object1');
+          expect(JSON.parse(body).fixtures[0]).to.eql('object1');
           done();
         });
       });
@@ -151,8 +150,8 @@ describe('Test-requests middleware', function() {
             clean_db: function(trDone) {
               setTimeout(function() {
                 y = 17;
-                trDone();
-              }, 500);
+                trDone({newY: y});
+              }, 200);
             }
           });
           done();
@@ -162,6 +161,13 @@ describe('Test-requests middleware', function() {
           expect(y).to.be(null);
           request(CLEAN_DB_URL, function(error, response, body) {
             expect(y).to.be(17);
+            done();
+          });
+        });
+
+        it('responds with return values when given', function(done) {
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(JSON.parse(body).newY).to.eql(17);
             done();
           });
         });
