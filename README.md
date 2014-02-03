@@ -66,12 +66,12 @@ testRequests.registerHandlers({
 
 ### Asynchronous code in handlers
 
-If your handler needs to wait for asynchronous actions to complete before responding, it can use a done() callback given as an optional final argument:
+If your handler needs to wait for asynchronous actions to complete before responding, it can use a `done()` callback given as an optional final argument:
 
 ```javascript
 testRequests.registerHandlers({
   create_widgets: function(request, response, done) {
-    Widget.bulkCreate(exampleData).success(function() {
+    Widget.bulkCreate(exampleData).success(function() { // callback from sequelize
       console.log("Successfully created widget fixtures");
       done();
     });
