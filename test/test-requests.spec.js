@@ -59,8 +59,13 @@ describe('Test-requests middleware', function() {
     });
 
     describe('when in the test environment', function() {
-
-      var testServer = reloadServerInEnv('test');
+      var testServer = reloadServerInEnv('test'),
+          withHandlerResponse = function(done, cb) {
+            request(CLEAN_DB_URL, function(error, response, body) {
+              cb(response, body, error);
+              done();
+            });
+          };
 
       before(function(done) {
         testServer.startServer(PORT, '/', done);
@@ -86,7 +91,6 @@ describe('Test-requests middleware', function() {
 
       describe('when requesting a registered handler', function() {
         var x;
-
         beforeEach(function() {
           x = null;
           testServer.testRequests.registerHandlers({
@@ -98,16 +102,14 @@ describe('Test-requests middleware', function() {
 
         it('calls the handler', function(done) {
           expect(x).to.be(null);
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function() {
             expect(x).to.be(5);
-            done();
           });
         });
 
         it('reponds successfully', function(done) {
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function(response) {
             expect(response.statusCode).to.be(200);
-            done();
           });
         });
       });
@@ -123,27 +125,22 @@ describe('Test-requests middleware', function() {
 
         it('responds with String return values when handlers return strings', function(done) {
           registerHandlerToReturn("Cleaned DB");
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function(response, body) {
             expect(body).to.match(/Cleaned DB/);
-            done();
           });
         });
 
         it('responds with JSON return values when handlers return objects', function(done) {
-          var fixtures = {fixtures: ['object1', 'object2']};
-          registerHandlerToReturn(fixtures);
-          request(CLEAN_DB_URL, function(error, response, body) {
+          registerHandlerToReturn({fixtures: ['object1', 'object2']});
+          withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body).fixtures[0]).to.eql('object1');
-            done();
           });
         });
 
         it('responds with JSON return values when handlers return arrays', function(done) {
-          var fixtures = ['object1', 'object2'];
-          registerHandlerToReturn(fixtures);
-          request(CLEAN_DB_URL, function(error, response, body) {
+          registerHandlerToReturn(['object1', 'object2']);
+          withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body)[0]).to.eql('object1');
-            done();
           });
         });
       });
@@ -167,23 +164,20 @@ describe('Test-requests middleware', function() {
 
         it('responds after the handler has finished', function(done) {
           expect(y).to.be(null);
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function() {
             expect(y).to.be(17);
-            done();
           });
         });
 
         it('responds with return values when given', function(done) {
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body).newY).to.eql(17);
-            done();
           });
         });
 
         it('provides access to the request and response objects', function(done) {
-          request(CLEAN_DB_URL, function(error, response, body) {
+          withHandlerResponse(done, function(response) {
             expect(response.headers["set-cookie"]).to.eql(["user_id=10"]);
-            done();
           });
         });
       });
