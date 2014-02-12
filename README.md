@@ -43,7 +43,7 @@ beforeEach(function() {
 
 NB: These handlers will never be available at server routes except in the test environment.
 
-If the handler returns a String or Object, this return value will be rendered into the response, as HTML or JSON respectively:
+If the handler returns a String or Object (including arrays), this return value will be rendered into the response, as HTML or JSON respectively:
 
 ```javascript
 testRequests.registerHandlers({
