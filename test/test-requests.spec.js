@@ -111,47 +111,41 @@ describe('Test-requests middleware', function() {
             done();
           });
         });
+      });
 
-        it('responds with String return values when handlers return strings', function(done) {
+      describe('when a return value is given', function() {
+        var registerHandlerToReturn = function(returnVal) {
           testServer.testRequests.registerHandlers({
             clean_db: function() {
-              return "Cleaned DB";
+              return returnVal;
             }
           });
+        };
+
+        it('responds with String return values when handlers return strings', function(done) {
+          registerHandlerToReturn("Cleaned DB");
           request(CLEAN_DB_URL, function(error, response, body) {
             expect(body).to.match(/Cleaned DB/);
             done();
           });
         });
-      });
 
-      it('responds with JSON return values when handlers return objects', function(done) {
-        var fixtures = {fixtures: ['object1', 'object2']};
-
-        testServer.testRequests.registerHandlers({
-          clean_db: function() {
-            return fixtures;
-          }
+        it('responds with JSON return values when handlers return objects', function(done) {
+          var fixtures = {fixtures: ['object1', 'object2']};
+          registerHandlerToReturn(fixtures);
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(JSON.parse(body).fixtures[0]).to.eql('object1');
+            done();
+          });
         });
 
-        request(CLEAN_DB_URL, function(error, response, body) {
-          expect(JSON.parse(body).fixtures[0]).to.eql('object1');
-          done();
-        });
-      });
-
-      it('responds with JSON return values when handlers return arrays', function(done) {
-        var fixtures = ['object1', 'object2'];
-
-        testServer.testRequests.registerHandlers({
-          clean_db: function() {
-            return fixtures;
-          }
-        });
-
-        request(CLEAN_DB_URL, function(error, response, body) {
-          expect(JSON.parse(body)[0]).to.eql('object1');
-          done();
+        it('responds with JSON return values when handlers return arrays', function(done) {
+          var fixtures = ['object1', 'object2'];
+          registerHandlerToReturn(fixtures);
+          request(CLEAN_DB_URL, function(error, response, body) {
+            expect(JSON.parse(body)[0]).to.eql('object1');
+            done();
+          });
         });
       });
 
