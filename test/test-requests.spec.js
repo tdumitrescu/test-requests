@@ -123,21 +123,21 @@ describe('Test-requests middleware', function() {
           });
         };
 
-        it('responds with String return values when handlers return strings', function(done) {
+        it('responds with a String', function(done) {
           registerHandlerToReturn("Cleaned DB");
           withHandlerResponse(done, function(response, body) {
             expect(body).to.match(/Cleaned DB/);
           });
         });
 
-        it('responds with JSON return values when handlers return objects', function(done) {
+        it('responds with a JSON object', function(done) {
           registerHandlerToReturn({fixtures: ['object1', 'object2']});
           withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body).fixtures[0]).to.eql('object1');
           });
         });
 
-        it('responds with JSON return values when handlers return arrays', function(done) {
+        it('responds with a JSON array', function(done) {
           registerHandlerToReturn(['object1', 'object2']);
           withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body)[0]).to.eql('object1');
@@ -169,7 +169,7 @@ describe('Test-requests middleware', function() {
           });
         });
 
-        it('responds with return values when given', function(done) {
+        it('responds with a return value when given', function(done) {
           withHandlerResponse(done, function(response, body) {
             expect(JSON.parse(body).newY).to.eql(17);
           });
