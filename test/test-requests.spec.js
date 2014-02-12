@@ -20,22 +20,22 @@ describe('Test-requests middleware', function() {
 
   describe('registerHandlers()', function() {
 
-    var cleanDB = function() {};
+    var myHandler = function() {};
 
     it('registers the given handler functions', function() {
-      expect(testRequests.registeredHandlers.clean_db).to.be(undefined);
-      testRequests.registerHandlers({clean_db: cleanDB});
-      expect(testRequests.registeredHandlers.clean_db).to.be(cleanDB);
+      expect(testRequests.registeredHandlers.my_handler).to.be(undefined);
+      testRequests.registerHandlers({my_handler: myHandler});
+      expect(testRequests.registeredHandlers.my_handler).to.be(myHandler);
     });
 
   });
 
   describe('request-processing', function() {
 
-    var PORT          = 3434,
-        SERVER_URL    = 'http://localhost:' + PORT + '/',
-        TEST_BASE_URL = SERVER_URL + '_test/',
-        CLEAN_DB_URL  = TEST_BASE_URL + 'clean_db';
+    var PORT           = 3434,
+        SERVER_URL     = 'http://localhost:' + PORT + '/',
+        TEST_BASE_URL  = SERVER_URL + '_test/',
+        MY_HANDLER_URL = TEST_BASE_URL + 'my_handler';
 
     describe('when not in the test environment', function() {
 
@@ -50,7 +50,7 @@ describe('Test-requests middleware', function() {
       });
 
       it('passes along all requests without processing', function(done) {
-        request(CLEAN_DB_URL, function(error, response, body) {
+        request(MY_HANDLER_URL, function(error, response, body) {
           expect(body).to.match(/Default response/);
           done();
         });
@@ -61,7 +61,7 @@ describe('Test-requests middleware', function() {
     describe('when in the test environment', function() {
       var testServer = reloadServerInEnv('test'),
           withHandlerResponse = function(done, cb) {
-            request(CLEAN_DB_URL, function(error, response, body) {
+            request(MY_HANDLER_URL, function(error, response, body) {
               cb(response, body, error);
               done();
             });
@@ -94,7 +94,7 @@ describe('Test-requests middleware', function() {
         beforeEach(function() {
           x = null;
           testServer.testRequests.registerHandlers({
-            clean_db: function() {
+            my_handler: function() {
               x = 5;
             }
           });
@@ -117,7 +117,7 @@ describe('Test-requests middleware', function() {
       describe('when a return value is given', function() {
         var registerHandlerToReturn = function(returnVal) {
           testServer.testRequests.registerHandlers({
-            clean_db: function() {
+            my_handler: function() {
               return returnVal;
             }
           });
@@ -151,7 +151,7 @@ describe('Test-requests middleware', function() {
         beforeEach(function(done) {
           y = null;
           testServer.testRequests.registerHandlers({
-            clean_db: function(req, res, trDone) {
+            my_handler: function(req, res, trDone) {
               res.setHeader("Set-Cookie", "user_id=10");
               setTimeout(function() {
                 y = 17;
