@@ -87,14 +87,13 @@ describe('Test-requests middleware', function() {
       describe('when requesting a registered handler', function() {
         var x;
 
-        beforeEach(function(done) {
+        beforeEach(function() {
           x = null;
           testServer.testRequests.registerHandlers({
             clean_db: function() {
               x = 5;
             }
           });
-          done();
         });
 
         it('calls the handler', function(done) {
