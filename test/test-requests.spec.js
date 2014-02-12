@@ -140,6 +140,20 @@ describe('Test-requests middleware', function() {
         });
       });
 
+      it('responds with JSON return values when handlers return arrays', function(done) {
+        var fixtures = ['object1', 'object2'];
+
+        testServer.testRequests.registerHandlers({
+          clean_db: function() {
+            return fixtures;
+          }
+        });
+
+        request(CLEAN_DB_URL, function(error, response, body) {
+          expect(JSON.parse(body)[0]).to.eql('object1');
+          done();
+        });
+      });
 
       describe('when the handler uses a done() callback for asynchronous operations', function() {
         var y;
@@ -179,10 +193,7 @@ describe('Test-requests middleware', function() {
             done();
           });
         });
-
       });
-
     });
-
   });
 });
